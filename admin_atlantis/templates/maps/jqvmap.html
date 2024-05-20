@@ -17,9 +17,25 @@
 						</p>
 					</div>
 					<div class="card-body">
+						<form method="post">
+							{% csrf_token %}
+							<div class="row row-demo-grid">
+								<div class="col-6">
+									<div class="card">
+										<input type="date" name="startDate">
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="card">
+										<input type="date" name="endDate">
+									</div>
+								</div>
+							</div>
+							<button class="btn btn-danger" type="submit">predict</button>
+						</form>
 						<div class="col-md-10 ml-auto mr-auto">
 							<div class="mapcontainer">
-								<div id="map-example" class="vmap" style="height: 400px"></div>
+								<div id="map" class="vmap" style="height: 400px"></div>
 							</div>
 						</div>
 					</div>
@@ -29,30 +45,95 @@
 	</div>
 {% endblock content %}
 {% block extrajs %}
-	<script>
-		$('#map-example').vectorMap(
-		{
-			map: 'world_en',
-			backgroundColor: 'transparent',
-			borderColor: '#fff',
-			borderWidth: 2,
-			color: '#e4e4e4',
-			enableZoom: true,
-			hoverColor: '#35cd3a',
-			hoverOpacity: null,
-			normalizeFunction: 'linear',
-			scaleColors: ['#b6d6ff', '#005ace'],
-			selectedColor: '#35cd3a',
-			selectedRegions: ['ID', 'RU', 'US', 'AU'],
-			showTooltip: true,
-			onRegionClick: function(element, code, region)
-			{
-				return false;
-			},
-			onResize: function (element, width, height) {
-				console.log('Map Size: ' +  width + 'x' +  height);
-			},
-		});
-	</script>
+<!--<script src="../../..static/donnees.geojson"></script>-->
+<script src="https://unpkg.com/wellknown@0.7.4/dist/wellknown.min.js"></script>
+<!-- Importer Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+	var map = L.map('map').setView([36.750890, 5.056733], 13);
+	L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
+		maxZoom: 20,
+		attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	}).addTo(map);
+/*
+	// Charger le fichier JSON contenant les données
+	// Charger le fichier JSON contenant les données
+var geometryData = "{{geometry|safe}}";
+
+var geometry_object = geometryData['0'][0]['geometry']
+console.log(geometryData)
+console.log(geometry_object)
+*/
+$(document).ready(function() {
+            $.ajax({
+                url: '../../../static/donnees.geojson',
+                dataType: 'json',
+                success: function(data) {
+                    console.log("GeoJSON Data: ", data);
+
+                    // Initialiser la carte
+                    var map = L.map('map').setView([48.8566, 2.3522], 6); // Centré sur Paris par exemple
+
+                    // Ajouter une couche de tuiles (carte de base)
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    // Ajouter les données GeoJSON à la carte
+                    var polygonData = L.geoJSON(data, {
+                        onEachFeature: function (feature, layer) {
+                            layer.bindPopup(`<b>Name: </b>` + feature.properties.name);
+                        },
+                        style: {
+                            fillColor: 'red',
+                            fillOpacity: 0.5,
+                            color: 'black',
+                            weight: 2,
+                        }
+                    }).addTo(map);
+
+                    console.log(polygonData.toGeoJSON());
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("Error loading GeoJSON: ", textStatus, errorThrown);
+                }
+            });
+        });
+
+/*data=[]
+const apiUrl = "https://pfedouwaf.rmrdevdz.com/geo";
+    fetch(apiUrl)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Problem");
+            }
+            return response.json();
+        })
+        .then((data) => {
+
+            var 
+			geometryData = data;
+
+            var geometry_object = geometryData["0"];
+            // console.log(GeometryObject:${geometry_object});
+			geometry_object.forEach(element => {
+				var polygonData = L.geoJSON(geometry_object, {
+                onEachFeature: function (feature, layer) {
+                },
+                style: {
+                    fillColor: "red",
+                    fillOpacity: 0.1,
+                    color: "black",
+                    weight: 2,
+                },
+            }).addTo(map);
+			});
+            ;
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+		*/
+</script>
 {% endblock extrajs %}
 

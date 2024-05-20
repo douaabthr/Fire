@@ -36,5 +36,4 @@ urlpatterns = [
     path('maps/jqvmap/', views.maps, name='maps'),
     path('widgets/', views.widgets, name='widgets'),
     path('dataBase/dataBase/', views.constructionData, name='dataBase'),
-    path('dataBase/Predection/', views.predection, name='Predection')
 ]
