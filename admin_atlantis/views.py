@@ -472,7 +472,8 @@ def maps(request):
     
         start_date = request.POST.get('startDate')
         end_date = request.POST.get('endDate')
-
+        uploaded_file = request.FILES['exampleFormControlFile1']
+        print(uploaded_file)
         start_date = datetime.strptime(start_date, '%Y-%m-%d').strftime('%d/%m/%Y')
         end_date = datetime.strptime(end_date, '%Y-%m-%d').strftime('%d/%m/%Y')
 
