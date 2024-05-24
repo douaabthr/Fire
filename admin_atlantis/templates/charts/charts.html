@@ -140,7 +140,7 @@
 	var myLineChart = new Chart(lineChart, {
 		type: 'line',
 		data: {
-			labels: "{{years|safe}}",
+			labels: {{years|safe}},
 			datasets: [{
 				label: "Active Users",
 				borderColor: "#1d7af3",
@@ -153,7 +153,7 @@
 				backgroundColor: 'transparent',
 				fill: true,
 				borderWidth: 2,
-				data: "{{counts|safe}}"
+				data: {{counts|safe}}
 			}]
 		},
 		options : {
@@ -180,8 +180,6 @@
 			}
 		}
 	});
-	var years="{{context|safe}}"
-	console.log(years)
 	var myBarChart = new Chart(barChart, {
 		type: 'bar',
 		data: {
@@ -190,7 +188,7 @@
 				label: "Sales",
 				backgroundColor: 'rgb(23, 125, 255)',
 				borderColor: 'rgb(23, 125, 255)',
-				data: [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+				data: {{counts_2022|safe}},
 			}],
 		},
 		options: {
@@ -359,7 +357,7 @@
 				backgroundColor: 'transparent',
 				fill: true,
 				borderWidth: 2,
-				data: [30, 45, 45, 68, 69, 90, 100, 158, 177, 200, 245, 256]
+				data: {{asi|safe}}
 			},{
 				label: "PHP",
 				borderColor: "#59d05d",
@@ -372,7 +370,7 @@
 				backgroundColor: 'transparent',
 				fill: true,
 				borderWidth: 2,
-				data: [10, 20, 55, 75, 80, 48, 59, 55, 23, 107, 60, 87]
+				data: {{ndvi|safe}}
 			}, {
 				label: "Ruby",
 				borderColor: "#f3545d",
@@ -385,7 +383,7 @@
 				backgroundColor: 'transparent',
 				fill: true,
 				borderWidth: 2,
-				data: [10, 30, 58, 79, 90, 105, 117, 160, 185, 210, 185, 194]
+				data: {{vhi|safe}}
 			}]
 		},
 		options : {
@@ -495,7 +493,7 @@
 				legendColor: '#f3545d',
 				fill: true,
 				borderWidth: 1,
-				data: [154, 184, 175, 203, 210, 231, 240, 278, 252, 312, 320, 374]
+				data: {{tempDayMoy|safe}}
 			}, {
 				label: "New Visitors",
 				borderColor: gradientStroke3,
@@ -505,17 +503,7 @@
 				legendColor: '#fdaf4b',
 				fill: true,
 				borderWidth: 1,
-				data: [256, 230, 245, 287, 240, 250, 230, 295, 331, 431, 456, 521]
-			}, {
-				label: "Active Users",
-				borderColor: gradientStroke,
-				pointBackgroundColor: gradientStroke,
-				pointRadius: 0,
-				backgroundColor: gradientFill,
-				legendColor: '#177dff',
-				fill: true,
-				borderWidth: 1,
-				data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 900]
+				data: {{tempNightMoy|safe}}
 			}]
 		},
 		options : {

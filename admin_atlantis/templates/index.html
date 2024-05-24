@@ -6,3 +6,174 @@
 {% block content %}
 	{% include 'includes/dashboard-content.html' %}
 {% endblock content %}
+{% block extrajs %}
+<script>
+	var counts = {{ counts|safe }};
+    var totalFires = counts.reduce((sum, value) => sum + value, 0);
+	document.getElementById('totalFires').innerText = totalFires.toLocaleString();
+
+	var years = {{ years|safe }};
+    var maxCount = Math.max(...counts);
+    var maxYears = years.filter((year, index) => counts[index] === maxCount);
+	document.getElementById('AnAvecMax').innerText = maxYears;
+
+	var minCount = Math.min(...counts);
+    var minYears = years.filter((year, index) => counts[index] === minCount);
+	document.getElementById('AnAvecMin').innerText = minYears;
+    // Mettre à jour le contenu de l'élément <h1> avec la somme calculée
+	
+	var averageCounts = totalFires / counts.length;
+	averageCounts = Math.round(averageCounts);
+	document.getElementById('moy').innerText = averageCounts;
+/*
+	var tempday = {{ tempDayMoy|safe }};
+	console.log(tempday)
+    var totaltemp = tempday.reduce((sum, value) => sum + value, 0);
+	var averagetemp = totaltemp / tempday.length;
+	averagetemp = Math.round(averagetemp);
+	document.getElementById('tempday').innerText = averagettemp;
+
+	var tempnight = {{ tempNightMoy|safe }};
+    var totaltemp = tempnight.reduce((sum, value) => sum + value, 0);
+	var averagetemp = totaltemp / tempnight.length;
+	averagetemp = Math.round(averagetemp);
+	document.getElementById('tempnight').innerText = averagetemp;
+
+	var temp = (tempday+tempnight)/2
+	temp = Math.round(temp);
+	document.getElementById('temp').innerText = temp;
+
+    */
+    var lineChart = document.getElementById('lineChart').getContext('2d');
+	/*htmlLegendsChart = document.getElementById('htmlLegendsChart').getContext('2d');*/
+
+		var myLineChart = new Chart(lineChart, {
+		type: 'line',
+		data: {
+			labels: {{years|safe}},
+			datasets: [{
+				label: "Frequence de feux",
+				borderColor: "#1d7af3",
+				pointBorderColor: "#FFF",
+				pointBackgroundColor: "#1d7af3",
+				pointBorderWidth: 2,
+				pointHoverRadius: 4,
+				pointHoverBorderWidth: 1,
+				pointRadius: 4,
+				backgroundColor: 'transparent',
+				fill: true,
+				borderWidth: 2,
+				data: {{counts|safe}}
+			}]
+		},
+		options : {
+			responsive: true, 
+			maintainAspectRatio: false,
+			legend: {
+				position: 'bottom',
+				labels : {
+					padding: 10,
+					fontColor: '#1d7af3',
+				}
+			},
+			tooltips: {
+				bodySpacing: 4,
+				mode:"nearest",
+				intersect: 0,
+				position:"nearest",
+				xPadding:10,
+				yPadding:10,
+				caretPadding:10
+			},
+			layout:{
+				padding:{left:15,right:15,top:15,bottom:15}
+			}
+		}
+	});
+/*
+	var myHtmlLegendsChart = new Chart(htmlLegendsChart, {
+		type: 'line',
+		data: {
+			labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+			datasets: [ {
+				label: "Subscribers",
+				borderColor: gradientStroke2,
+				pointBackgroundColor: gradientStroke2,
+				pointRadius: 0,
+				backgroundColor: gradientFill2,
+				legendColor: '#f3545d',
+				fill: true,
+				borderWidth: 1,
+				data: {{tempDayMoy|safe}}
+			}, {
+				label: "New Visitors",
+				borderColor: gradientStroke3,
+				pointBackgroundColor: gradientStroke3,
+				pointRadius: 0,
+				backgroundColor: gradientFill3,
+				legendColor: '#fdaf4b',
+				fill: true,
+				borderWidth: 1,
+				data: {{tempNightMoy|safe}}
+			}]
+		},
+		options : {
+			responsive: true, 
+			maintainAspectRatio: false,
+			legend: {
+				display: false
+			},
+			tooltips: {
+				bodySpacing: 4,
+				mode:"nearest",
+				intersect: 0,
+				position:"nearest",
+				xPadding:10,
+				yPadding:10,
+				caretPadding:10
+			},
+			layout:{
+				padding:{left:15,right:15,top:15,bottom:15}
+			},
+			scales: {
+				yAxes: [{
+					ticks: {
+						fontColor: "rgba(0,0,0,0.5)",
+						fontStyle: "500",
+						beginAtZero: false,
+						maxTicksLimit: 5,
+						padding: 20
+					},
+					gridLines: {
+						drawTicks: false,
+						display: false
+					}
+				}],
+				xAxes: [{
+					gridLines: {
+						zeroLineColor: "transparent"
+					},
+					ticks: {
+						padding: 20,
+						fontColor: "rgba(0,0,0,0.5)",
+						fontStyle: "500"
+					}
+				}]
+			}, 
+			legendCallback: function(chart) { 
+				var text = []; 
+				text.push('<ul class="' + chart.id + '-legend html-legend">'); 
+				for (var i = 0; i < chart.data.datasets.length; i++) { 
+					text.push('<li><span style="background-color:' + chart.data.datasets[i].legendColor + '"></span>'); 
+					if (chart.data.datasets[i].label) { 
+						text.push(chart.data.datasets[i].label); 
+					} 
+					text.push('</li>'); 
+				} 
+				text.push('</ul>'); 
+				return text.join(''); 
+			}  
+		}
+	});*/
+</script>
+{% endblock extrajs %}

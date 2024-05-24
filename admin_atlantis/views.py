@@ -50,9 +50,121 @@ def recover_password(request):
 
 # Pages -- Dashboard
 def dashboard(request):
+    csv_file_path = 'static/firestatstique.csv'
+    year_counts = Counter()
+    month_counts_2022 = Counter()
+
+    with open(csv_file_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            year = row['ACQ_DATE'].split('/')[0]  # Assuming 'date' is in 'YYYY-MM-DD' format
+            month = row['ACQ_DATE'].split('/')[1]
+            year_counts[year] += 1
+            if year == '2022':
+                month_counts_2022[month] += 1
+
+    # Préparer les données pour Chart.js
+    years = list(range(2009, 2023))
+    counts = [year_counts[str(year)] for year in years]
+
+    months_2022 = list(range(1, 13))
+    counts_2022 = [month_counts_2022[str(month)] for month in months_2022]
+
+    types = ['asi2023', 'ndvi2023', 'vhi2023', 'rain2023']
+    date_start = '2023-01-01'
+    date_end = '2023-10-30'
+
+    processed_data = {}
+    for data_type in types:
+        api_data = get_data_temporelle_from_api(data_type, date_start, date_end)
+        df = pd.DataFrame(api_data[1:], columns=api_data[0])
+        if api_data:
+            df['Date'] = pd.to_datetime(df['Date'])
+            df['Data'] = pd.to_numeric(df['Data'], errors='coerce')
+            monthly_average = df.groupby(df['Date'].dt.month)['Data'].mean().apply(round)
+            processed_data[data_type] = monthly_average
+        else:
+            processed_data[data_type] = None
+        
+
+
+    asi_2023 = processed_data["asi2023"]
+# Create a list with zeros for each month from 1 to 12
+    asi_2022 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in asi_2023.items():
+        asi_2022[int(month) - 1] = value
+
+
+
+    ndvi_2023 = processed_data["ndvi2023"]
+# Create a list with zeros for each month from 1 to 12
+    ndvi_2022 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in ndvi_2023.items():
+        ndvi_2022[int(month) - 1] = value
+
+
+    vhi_2023 = processed_data["vhi2023"]
+# Create a list with zeros for each month from 1 to 12
+    vhi_2022 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in vhi_2023.items():
+        vhi_2022[int(month) - 1] = value
+
+        
+    rain_2023 = processed_data["rain2023"]
+# Create a list with zeros for each month from 1 to 12
+    rain_2022 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in rain_2023.items():
+        rain_2022[int(month) - 1] = value
+
+    print(asi_2023)
+    print(counts_2022)
+
+    api_data = get_data_temporelle_from_api("meteo2023", date_start, date_end)
+    df1 = pd.DataFrame(api_data[1:], columns=api_data[0])
+    if api_data:
+        df1['DATE'] = pd.to_datetime(df1['DATE'])
+        df1['TEMPERATURE_JOUR'] = pd.to_numeric(df1['TEMPERATURE_JOUR'], errors='coerce')
+        df1['TEMPERATURE_NIGHT'] = pd.to_numeric(df1['TEMPERATURE_NIGHT'], errors='coerce')
+        monthly_average = df1.groupby(df1['DATE'].dt.month)['TEMPERATURE_JOUR'].mean().apply(round)
+        tempDayMoy = monthly_average
+        monthly_average = df1.groupby(df1['DATE'].dt.month)['TEMPERATURE_NIGHT'].mean().apply(round)
+        tempNightMoy = monthly_average
+    else:
+        tempDayMoy = None
+        tempNightMoy = None
+    
+    tempDayMoy_2023 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in tempDayMoy.items():
+        tempDayMoy_2023[int(month) - 1] = value
+
+    tempNightMoy_2023 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in tempNightMoy.items():
+        tempNightMoy_2023[int(month) - 1] = value
+
+    print(asi_2023)
+    print(counts_2022)
+
     context = {
-        'active_page': 'dashboard' 
+        'active_page': 'charts',
+        'years': years,
+        'counts': counts,
+        'months_2022': months_2022,
+        'counts_2022': counts_2022,
+        'asi': asi_2022,
+        'ndvi': ndvi_2022,
+        'vhi': vhi_2022,
+        'rain': rain_2022,
+        "tempDayMoy": tempDayMoy_2023,
+        "tempNightMoy": tempNightMoy_2023,
     }
+
+
     return render(request, 'index.html',context)
 
 @login_required(login_url='/accounts/login/')
@@ -195,26 +307,147 @@ def tables(request):
 # Charts 
 @login_required(login_url='/accounts/login/') 
 def charts(request):
-    csv_file_path = 'firestatstique.csv'
+    csv_file_path = 'static/firestatstique.csv'
     year_counts = Counter()
+    month_counts_2022 = Counter()
 
     with open(csv_file_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             year = row['ACQ_DATE'].split('/')[0]  # Assuming 'date' is in 'YYYY-MM-DD' format
+            month = row['ACQ_DATE'].split('/')[1]
             year_counts[year] += 1
+            if year == '2022':
+                month_counts_2022[month] += 1
 
     # Préparer les données pour Chart.js
     years = list(range(2009, 2023))
     counts = [year_counts[str(year)] for year in years]
 
+    months_2022 = list(range(1, 13))
+    counts_2022 = [month_counts_2022[str(month)] for month in months_2022]
+
+    types = ['asi2023', 'ndvi2023', 'vhi2023', 'rain2023']
+    date_start = '2023-01-01'
+    date_end = '2023-10-30'
+
+    processed_data = {}
+    for data_type in types:
+        api_data = get_data_temporelle_from_api(data_type, date_start, date_end)
+        df = pd.DataFrame(api_data[1:], columns=api_data[0])
+        if api_data:
+            df['Date'] = pd.to_datetime(df['Date'])
+            df['Data'] = pd.to_numeric(df['Data'], errors='coerce')
+            monthly_average = df.groupby(df['Date'].dt.month)['Data'].mean().apply(round)
+            processed_data[data_type] = monthly_average
+        else:
+            processed_data[data_type] = None
+        
+
+
+    asi_2023 = processed_data["asi2023"]
+# Create a list with zeros for each month from 1 to 12
+    asi_2022 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in asi_2023.items():
+        asi_2022[int(month) - 1] = value
+
+
+
+    ndvi_2023 = processed_data["ndvi2023"]
+# Create a list with zeros for each month from 1 to 12
+    ndvi_2022 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in ndvi_2023.items():
+        ndvi_2022[int(month) - 1] = value
+
+
+    vhi_2023 = processed_data["vhi2023"]
+# Create a list with zeros for each month from 1 to 12
+    vhi_2022 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in vhi_2023.items():
+        vhi_2022[int(month) - 1] = value
+
+        
+    rain_2023 = processed_data["rain2023"]
+# Create a list with zeros for each month from 1 to 12
+    rain_2022 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in rain_2023.items():
+        rain_2022[int(month) - 1] = value
+
+    print(asi_2023)
+    print(counts_2022)
+        
+    api_data = get_data_temporelle_from_api("meteo2023", date_start, date_end)
+    df1 = pd.DataFrame(api_data[1:], columns=api_data[0])
+    if api_data:
+        df1['DATE'] = pd.to_datetime(df1['DATE'])
+        df1['TEMPERATURE_JOUR'] = pd.to_numeric(df1['TEMPERATURE_JOUR'], errors='coerce')
+        df1['TEMPERATURE_NIGHT'] = pd.to_numeric(df1['TEMPERATURE_NIGHT'], errors='coerce')
+        monthly_average = df1.groupby(df1['DATE'].dt.month)['TEMPERATURE_JOUR'].mean().apply(round)
+        tempDayMoy = monthly_average
+        monthly_average = df1.groupby(df1['DATE'].dt.month)['TEMPERATURE_NIGHT'].mean().apply(round)
+        tempNightMoy = monthly_average
+    else:
+        tempDayMoy = None
+        tempNightMoy = None
+    
+    tempDayMoy_2023 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in tempDayMoy.items():
+        tempDayMoy_2023[int(month) - 1] = value
+
+    tempNightMoy_2023 = [0] * 12
+# Update the values for months that have data available in 2023
+    for month, value in tempNightMoy.items():
+        tempNightMoy_2023[int(month) - 1] = value
+
+    print(asi_2023)
+    print(counts_2022)
+            
     context = {
         'active_page': 'charts',
         'years': years,
         'counts': counts,
+        'months_2022': months_2022,
+        'counts_2022': counts_2022,
+        'asi': asi_2022,
+        'ndvi': ndvi_2022,
+        'vhi': vhi_2022,
+        'rain': rain_2022,
+        "tempDayMoy": tempDayMoy_2023,
+        "tempNightMoy": tempNightMoy_2023,
     }
 
     return render(request, 'charts/charts.html', context)
+
+import requests
+from datetime import datetime
+from collections import defaultdict
+
+def calculate_monthly_average(data):
+    
+    '''monthly_data = defaultdict(list)
+
+    for entry in data:
+        # Assurez-vous que 'Date' est la clé correcte pour la date dans vos données
+        date_str = entry.get('Date', '')  
+        if not date_str:
+            continue  # Ignore entries without a date
+
+        # Assurez-vous que le format de date correspond à celui de vos données
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+        month = date_obj.month
+
+        # Assurez-vous que 'Data' est la clé correcte pour les valeurs à utiliser
+        value = entry.get('Data', 0)  
+        monthly_data[month].append(value)
+
+    # Calculer la moyenne mensuelle pour chaque mois
+    monthly_average = {month: sum(values) / len(values) for month, values in monthly_data.items()}
+    return monthly_average'''
 
 import csv
 from collections import Counter
@@ -248,10 +481,17 @@ def maps(request):
         #'active_page': 'maps' ,
         #'geometry': reponse
         #}
-        if reponse:
-            return render(request, 'maps/jqvmap.html')
-        else:
-            return render(request, 'maps/jqvmap.html')
+       #if reponse:
+        #print(reponse)
+        context = {
+        'prediction_data': json.dumps(reponse)
+            }
+
+        return render(request, 'maps/jqvmap.html', context)
+        
+        #return render(request, 'maps/jqvmap.html',reponse)
+        #else:
+            #return render(request, 'maps/jqvmap.html')
     else:
         # Gérer la logique pour les autres méthodes HTTP si nécessaire
         #return HttpResponseNotAllowed(['POST'])
@@ -488,7 +728,7 @@ def constructionData(request,dateS,dateE):
     intersection = intersection.drop_duplicates()
     # Colonnes à supprimer avec apostrophes simples
    
-    colonnes_a_supprimer = ['AREA','fid','geometry', 'Date','CLOUDCOVER_AVG_PERCENT'
+    colonnes_a_supprimer = ['fid','geometry', 'Date','CLOUDCOVER_AVG_PERCENT'
        , 'TEMPERATURE_MORNING_C', 'TEMPERATURE_NOON_C', 'TEMPERATURE_EVENING_C',
         'WEATHER_CODE_MORNING',
        'WEATHER_CODE_NOON', 'WEATHER_CODE_EVENING', 'SUNHOUR', 'OPINION', 'SUNSET', 'SUNRISE',
@@ -512,6 +752,7 @@ def constructionData(request,dateS,dateE):
     print(dataAvecGeo.columns)
     print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
     print(len(dataAvecGeo))
+    print(len(dataAvecGeo.columns))
 
     return dataAvecGeo
 
@@ -528,7 +769,7 @@ def get_geometry_from_api():
     else:
         return None
 '''
-
+from sklearn.impute import SimpleImputer
 def pretraitement(request,dateS,dateE):
     print("*********************dkhlt praitratement")
 
@@ -553,6 +794,8 @@ def pretraitement(request,dateS,dateE):
     data['Month'] = data['DATE'].dt.month
     data['Day'] = data['DATE'].dt.day
     data.drop(columns=['DATE'])
+
+
     
     print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
     print(len(data))
@@ -607,7 +850,9 @@ def make_prediction(request,dateS,dateE):
         #for i, fichier in enumerate(os.listdir(chemin_repertoire)):
                 #if fichier.endswith('.pkl'):  # Vérifiez si le fichier est un modèle (.pkl)
                     #chemin_modele = os.path.join(chemin_repertoire, f"sous_model{i}.pkl")
-        modele = jl.load('static/DTmodelee.pkl')
+        imputer = SimpleImputer(strategy='mean')  # Vous pouvez aussi utiliser 'median' ou 'constant'
+        data = imputer.fit_transform(data)
+        modele = jl.load('static/rfAugModel.pkl')
         #liste_modeles.append(modele)
 
         #predictions = []
@@ -668,6 +913,56 @@ def generation_carte_risque(request,dateS,dateE):
                 geometry = wkt.loads(wkt_str)
                 geometries_geojson.append(mapping(geometry))
 
+        print(len(geometries_geojson))
+
+        ir_df = pd.read_csv('static/ir (1).csv')
+        print("###########################################################")
+        print(ir_df['_max'])
+    # Transformer la colonne '_max' en pourcentage
+        max_value = ir_df['_max'].max()
+        ir_df['_max'] = (ir_df['_max'] / max_value) * 100
+        print(ir_df['_max'])
+    # Ajouter le pourcentage de risque aux géométries GeoJSON correspondantes
+        def get_risk_percentage(wkt_str):
+            return ir_df[ir_df['WKT'] == wkt_str]['_max'].values[0] if not ir_df[ir_df['WKT'] == wkt_str].empty else None
+
+    # Créer un dictionnaire avec les données GeoJSON à sauvegarder
+        '''donnees_geojson = {
+            "type": "FeatureCollection",
+            "features": []
+        }'''
+        donnees_geojson = {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "geometry": geojson,
+                        "properties": {
+                            "name": f"Zone numéro {numZone}",
+                            "risque":get_risk_percentage(wkt_str)
+                        }
+                    } for geojson, wkt_str, numZone in zip(geometries_geojson, geometries_correspondantes, range(1, len(geometries_geojson) + 1))]
+            }
+        return donnees_geojson
+''''
+        for geojson in geometries_geojson:
+            wkt_str = wkt.dumps(wkt.loads(json.dumps(geojson)))
+            risk_percentage = get_risk_percentage(wkt_str)
+            if risk_percentage is not None:
+                feature = {
+                    "type": "Feature",
+                    "geometry": geojson,
+                    "properties": {
+                        "name": "Nom de la géométrie",
+                        "risque": risk_percentage
+                }
+            }
+                donnees_geojson["features"].append(feature)
+'''
+
+    # Retourner les données GeoJSON modifiées
+            
+'''
     # Créer un dictionnaire avec les données GeoJSON à sauvegarder
         donnees_geojson = {
                 "type": "FeatureCollection",
@@ -681,20 +976,21 @@ def generation_carte_risque(request,dateS,dateE):
                     } for geojson in geometries_geojson  
                 ]
             }
-        json_data = json.dumps(donnees_geojson)
+        #json_data = json.dumps(donnees_geojson)
 
     # Ajouter le préfixe personnalisé
-        json_data_with_prefix = "var polygone = " + json_data
+        #json_data_with_prefix = "var polygone = " + json_data
 
     # Écrire la chaîne résultante dans le fichier
-        with open('static/donnees.geojson', 'w') as f:
-            f.write(json_data_with_prefix)
+        #with open('static/donnees.geojson', 'w') as f:
+            #f.write(json_data_with_prefix)
 
         #reponse = set_geometry_from_api(donnees_geojson)
         #print(reponse)
-        return  json_data_with_prefix      
+        return  donnees_geojson      
 
 
 # Sauvegarder les données GeoJSON dans un fichier .geojson dams le server
         #with open('/content/donnees.geojson', 'w') as f:
             #json.dump(donnees_geojson, f)
+'''

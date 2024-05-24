@@ -4,38 +4,88 @@
 	sidebar sidebar-style-2
 {% endblock sidebar_class %}
 {% block content %}
+<style>
+    .legend {
+        background: white;
+        line-height: 1.5;
+        padding: 6px 8px;
+        font: 14px Arial, Helvetica, sans-serif;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+    }
+    .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+    }
+    .legend .label {
+            line-height: 18px;
+            margin-bottom: 2px;
+            clear: both;
+        }
+</style>
 	<div class="content">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="card card-transparent">
-					<div class="card-header">
+				<!--	<div class="card-header">
 						<h4 class="card-title text-center">
-							Vector Maps
+							Allez prevenir les foret ..
 						</h4>
-						<p class="card-category text-center">
-							Looks great on any resolution. Made by our friends from <a href="https://www.10bestdesign.com/jqvmap/">jQuery Vector Maps</a>.
-						</p>
-					</div>
+					</div>-->
 					<div class="card-body">
 						<form method="post">
 							{% csrf_token %}
-							<div class="row row-demo-grid">
-								<div class="col-6">
-									<div class="card">
-										<input type="date" name="startDate">
-									</div>
-								</div>
-								<div class="col-6">
-									<div class="card">
-										<input type="date" name="endDate">
-									</div>
-								</div>
-							</div>
-							<button class="btn btn-danger" type="submit">predict</button>
+							<div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="card-title">Formulaire de prediction</div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label for="startDate">Date debut</label>
+                                                    <input type="date" class="form-control" id="startDate" name="startDate" style="color: white;">
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label for="endDate">Date fin</label>
+                                                    <input type="date" class="form-control" id="endDate" name="endDate" style="color: white;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                <div class="form-group form-floating-label">
+                                                    <select class="form-control input-solid" id="selectFloatingLabel2">
+                                                        <option value="">&nbsp;</option>
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                    </select>
+                                                    <label for="selectFloatingLabel2" class="placeholder">Zone</label>
+                                                </div>
+                                                </div>
+                                                <div class="col-md-6 d-flex justify-content-center align-items-center">
+                                                    <button class="btn btn-success mx-2" type="submit">Predict</button>
+                                                    <button class="btn btn-danger mx-2">Cancel</button>
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
 						</form>
-						<div class="col-md-10 ml-auto mr-auto">
+						<div class="col-md-12 ml-auto mr-auto">
 							<div class="mapcontainer">
-								<div id="map" class="vmap" style="height: 400px"></div>
+								<div id="map" class="vmap" style="height: 650px ;"></div>
 							</div>
 						</div>
 					</div>
@@ -45,60 +95,121 @@
 	</div>
 {% endblock content %}
 {% block extrajs %}
-<!--<script src="../../..static/donnees.geojson"></script>-->
 <script src="https://unpkg.com/wellknown@0.7.4/dist/wellknown.min.js"></script>
 <!-- Importer Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 	var map = L.map('map').setView([36.750890, 5.056733], 13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+    
+    var geometryData = {{ prediction_data | safe }}
+    console.log("_________________________________________________");
+    console.log(geometryData);
+
+    // Fonction pour déterminer la couleur en fonction du pourcentage de risque
+    function getColor(risk) {
+        return risk > 80 ? '#C40C0C' : // rouge foncé
+               risk > 60 ? '#FF6500' : // rouge clair
+               risk > 40 ? '#FFC100' : // orange
+               risk > 20 ? '#C4E4FF' : // bleu clair
+                           '#008DDA';  // bleu foncé
+    }
+    if(geometryData){
+    // Fonction de style pour chaque feature
+    function style(feature) {
+        return {
+            fillColor: getColor(feature.properties.risque),
+            fillOpacity: 0.08,
+            color: 'black',
+            weight: 0.5,
+        };
+    }
+
+    // Afficher les données GeoJSON sur la carte
+    L.geoJSON(geometryData, {
+        onEachFeature: function (feature, layer) {
+            layer.bindPopup(`<b>Name: </b>` + feature.properties.name + `<br><b>Risque: </b>` + feature.properties.risque + `%`);
+        },
+        style: style
+    }).addTo(map);}
+
+    var legend = L.control({ position: 'bottomright' });
+
+        legend.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'legend');
+            var grades = [0, 20, 40, 60, 80];
+            var labels = ['0-20%', '21-40%', '41-60%', '61-80%', '> 80%'];
+
+            div.innerHTML += '<b>Le risque:</b><br>';
+
+            // Boucler à travers les intervalles de légende pour générer une étiquette avec une couleur carrée pour chaque intervalle
+            for (var i = 0; i < grades.length; i++) {
+                div.innerHTML +=
+                    '<div class="label"><i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                    labels[i] + '</div>';
+            }
+
+            return div;
+        };
+
+        // Ajouter la légende à la carte
+        legend.addTo(map);
+	/*
+	var map = L.map('map').setView([36.750890, 5.056733], 13);
 	L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
 		maxZoom: 20,
 		attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 	}).addTo(map);
-/*
+
 	// Charger le fichier JSON contenant les données
 	// Charger le fichier JSON contenant les données
-var geometryData = "{{geometry|safe}}";
+	/*
+var geometryData = "{{reponse|safe}}";
 
 var geometry_object = geometryData['0'][0]['geometry']
 console.log(geometryData)
 console.log(geometry_object)
-*/
+
 $(document).ready(function() {
             $.ajax({
-                url: '../../../static/donnees.geojson',
+                url: 'donnees.geojson',
                 dataType: 'json',
                 success: function(data) {
                     console.log("GeoJSON Data: ", data);
 
-                    // Initialiser la carte
-                    var map = L.map('map').setView([48.8566, 2.3522], 6); // Centré sur Paris par exemple
+var polygonData = L.geoJSON(polygone, {
+	onEachFeature: function (feature, layer) {
+		layer.bindPopup(`<b>Name: </b>` + feature.properties.name)
+	},
+	style: {
+				fillColor: 'red',
+				fillOpacity: 0.5,
+				color: 'black',
+				weight: 2,
+	}
+}).addTo(map);
 
-                    // Ajouter une couche de tuiles (carte de base)
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(map);
+console.log(polygonData.toGeoJSON())
+*//*
+var geometryData = {{ prediction_data | safe  }}
+console.log("_________________________________________________")
+console.log(geometryData)
 
-                    // Ajouter les données GeoJSON à la carte
-                    var polygonData = L.geoJSON(data, {
-                        onEachFeature: function (feature, layer) {
-                            layer.bindPopup(`<b>Name: </b>` + feature.properties.name);
-                        },
-                        style: {
-                            fillColor: 'red',
-                            fillOpacity: 0.5,
-                            color: 'black',
-                            weight: 2,
-                        }
-                    }).addTo(map);
-
-                    console.log(polygonData.toGeoJSON());
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error("Error loading GeoJSON: ", textStatus, errorThrown);
-                }
-            });
-        });
+        // Afficher les données GeoJSON sur la carte
+        L.geoJSON(geometryData, {
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(`<b>Name: </b>` + feature.properties.name);
+            },
+            style: {
+                fillColor: 'red',
+                fillOpacity: 0.2,
+                color: 'black',
+                weight: 2,
+            }
+        }).addTo(map);
 
 /*data=[]
 const apiUrl = "https://pfedouwaf.rmrdevdz.com/geo";
