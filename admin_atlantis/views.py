@@ -472,8 +472,8 @@ def maps(request):
     
         start_date = request.POST.get('startDate')
         end_date = request.POST.get('endDate')
-        uploaded_file = request.FILES['exampleFormControlFile1']
-        print(uploaded_file)
+        #uploaded_file = request.FILES['exampleFormControlFile1']
+        #print(uploaded_file)
         start_date = datetime.strptime(start_date, '%Y-%m-%d').strftime('%d/%m/%Y')
         end_date = datetime.strptime(end_date, '%Y-%m-%d').strftime('%d/%m/%Y')
 
@@ -853,7 +853,7 @@ def make_prediction(request,dateS,dateE):
                     #chemin_modele = os.path.join(chemin_repertoire, f"sous_model{i}.pkl")
         imputer = SimpleImputer(strategy='mean')  # Vous pouvez aussi utiliser 'median' ou 'constant'
         data = imputer.fit_transform(data)
-        modele = jl.load('static/rfAugModel.pkl')
+        modele = jl.load('static/xgboost.pkl')
         #liste_modeles.append(modele)
 
         #predictions = []

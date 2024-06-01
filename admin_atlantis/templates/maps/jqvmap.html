@@ -167,7 +167,7 @@ sidebar sidebar-style-2
 
                 <div class="col-md-12 ml-auto mr-auto">
                     <div class="mapcontainer">
-                        <div id="map" class="vmap" style="height: 650px ;"></div>
+                        <div id="map" class="vmap" style="height: 650px ; width: 400; !important"></div>
                     </div>
                 </div>
             </div>
@@ -197,18 +197,18 @@ sidebar sidebar-style-2
 
     // Fonction pour déterminer la couleur en fonction du pourcentage de risque
     function getColor(risk) {
-        return risk > 80 ? '#C40C0C' : // rouge foncé
-            risk > 60 ? '#FF6500' : // rouge clair
-                risk > 40 ? '#FFC100' : // orange
-                    risk > 20 ? '#C4E4FF' : // bleu clair
-                        '#008DDA';  // bleu foncé
+        return risk > 56.67 ? '#CD0402' : // rouge foncé
+            risk > 33.21 ? '#FF6138' : // rouge clair
+                risk > 16.68 ? '#FF8C00' : // orange
+                    risk > 5.3 ? '#FFD34E' : // bleu clair
+                        '#ACF0F2';  // bleu foncé
     }
     if (geometryData) {
         // Fonction de style pour chaque feature
         function style(feature) {
             return {
                 fillColor: getColor(feature.properties.risque),
-                fillOpacity: 0.08,
+                fillOpacity: 0.05,
                 color: 'black',
                 weight: 0.5,
             };
@@ -227,7 +227,7 @@ sidebar sidebar-style-2
 
     legend.onAdd = function (map) {
         var div = L.DomUtil.create('div', 'legend');
-        var grades = [0, 20, 40, 60, 80];
+        var grades = [0, 5.3, 16.68, 33.21, 56.67];
         var labels = ['0-20%', '21-40%', '41-60%', '61-80%', '> 80%'];
 
         div.innerHTML += '<b>Le risque:</b><br>';
