@@ -149,7 +149,8 @@ def dashboard(request):
 
     print(asi_2023)
     print(counts_2022)
-
+    print("asi_2022")
+    print(asi_2022)
     context = {
         'active_page': 'charts',
         'years': years,

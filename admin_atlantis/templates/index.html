@@ -45,7 +45,70 @@
 
     */
     var lineChart = document.getElementById('lineChart').getContext('2d');
-	/*htmlLegendsChart = document.getElementById('htmlLegendsChart').getContext('2d');*/
+	htmlLegendsChart = document.getElementById('htmlLegendsChart').getContext('2d');
+	asi = document.getElementById('barChart').getContext('2d');
+	ndvi = document.getElementById('barChart2').getContext('2d');
+	vhi = document.getElementById('barChart3').getContext('2d');
+	rain = document.getElementById('barChart4').getContext('2d');
+
+
+			var rainBar = new Chart(rain, {
+		type: 'bar',
+		data: {
+			labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+			datasets : [{
+				label: "Rain 2022",
+				backgroundColor: '#59d05d',
+				borderColor: '#59d05d',
+				data: {{rain}}
+			}],
+		},
+		
+	});
+	
+		var vhiBar = new Chart(vhi, {
+		type: 'bar',
+		data: {
+			labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+			datasets : [{
+				label: "Vhi 2022",
+				backgroundColor: '#007BFF',
+				borderColor: '#007BFF',
+				data: {{vhi}}
+			}],
+		},
+		
+	});
+
+
+	var asiBar = new Chart(asi, {
+		type: 'bar',
+		data: {
+			labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+			datasets : [{
+				label: "Asi 2022",
+				backgroundColor: '#FFC107',
+				borderColor: '#FFC107',
+				data: {{asi}}
+			}],
+		},
+		
+	});
+		var ndvIBar = new Chart(ndvi, {
+		type: 'bar',
+		data: {
+			labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+			datasets : [{
+				label: "Ndvi 2022",
+				backgroundColor: '#FBFBFD',
+				borderColor: '#FBFBFD',
+				data: {{ndvi}}
+			}],
+		},
+		
+	});
+
+
 
 		var myLineChart = new Chart(lineChart, {
 		type: 'line',
@@ -90,8 +153,30 @@
 			}
 		}
 	});
-/*
-	var myHtmlLegendsChart = new Chart(htmlLegendsChart, {
+	var gradientStroke = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
+	gradientStroke.addColorStop(0, '#177dff');
+	gradientStroke.addColorStop(1, '#80b6f4');
+
+	var gradientFill = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
+	gradientFill.addColorStop(0, "rgba(23, 125, 255, 0.7)");
+	gradientFill.addColorStop(1, "rgba(128, 182, 244, 0.3)");
+
+	var gradientStroke2 = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
+	gradientStroke2.addColorStop(0, '#f3545d');
+	gradientStroke2.addColorStop(1, '#ff8990');
+
+	var gradientFill2 = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
+	gradientFill2.addColorStop(0, "rgba(243, 84, 93, 0.7)");
+	gradientFill2.addColorStop(1, "rgba(255, 137, 144, 0.3)");
+
+	var gradientStroke3 = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
+	gradientStroke3.addColorStop(0, '#fdaf4b');
+	gradientStroke3.addColorStop(1, '#ffc478');
+
+	var gradientFill3 = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
+	gradientFill3.addColorStop(0, "rgba(253, 175, 75, 0.7)");
+	gradientFill3.addColorStop(1, "rgba(255, 196, 120, 0.3)");
+	var myHtmlLegendsChart = new Chart("htmlLegendsChart", {
 		type: 'line',
 		data: {
 			labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -174,6 +259,6 @@
 				return text.join(''); 
 			}  
 		}
-	});*/
+	});
 </script>
 {% endblock extrajs %}
