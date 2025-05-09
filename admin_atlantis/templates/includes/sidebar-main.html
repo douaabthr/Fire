@@ -9,8 +9,8 @@
             <div class="info">
                 <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
                     <span>
-                        Hizrian
-                        <span class="user-level">Administrator</span>
+                        test
+                        <span class="user-level">user</span>
                         <span class="caret"></span>
                     </span>
                 </a>
@@ -53,7 +53,7 @@
                         </li>
                     </ul>
                 </div>
-            </li>
+            </li><!--
             <li class="nav-section">
                 <span class="sidebar-mini-icon">
                     <i class="fa fa-ellipsis-h"></i>
@@ -193,23 +193,24 @@
                         </li>
                     </ul>
                 </div>
-            </li>
+            </li>-->
             <li class="nav-item {% if active_page == 'maps' %} active submenu {% endif %}">
                 <a data-toggle="collapse" href="#maps">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <p>Maps</p>
+                    <i class="fas fa-fire"></i>
+                    <p>Prédire</p>
                     <span class="caret"></span>
                 </a>
                 <div class="collapse {% if active_page == 'maps' %} show {% endif %}" id="maps">
                     <ul class="nav nav-collapse">
                         <li>
                             <a href="{% url 'maps' %}">
-                                <span class="sub-item">JQVMap</span>
+                                <span class="sub-item">Map</span>
                             </a>
                         </li>
                     </ul>
                 </div>
             </li>
+            
             <li class="nav-item {% if active_page == 'charts' %} active submenu {% endif %}">
                 <a data-toggle="collapse" href="#charts">
                     <i class="far fa-chart-bar"></i>
@@ -237,11 +238,11 @@
                     <p>Widgets</p>
                     <span class="badge badge-success">4</span>
                 </a>
-            </li>
+            </li><!--
             <li class="nav-item">
                 <a data-toggle="collapse" href="#submenu">
-                    <i class="fas fa-bars"></i>
-                    <p>Menu Levels</p>
+                    <i class="fas fa-info-circle"></i>
+                    <p>About</p>
                     <span class="caret"></span>
                 </a>
                 <div class="collapse" id="submenu">
@@ -293,7 +294,7 @@
                 <a href="https://appseed.us/admin-dashboards/flask-dashboard-atlantis" 
                             class="btn btn-primary btn-block">
                             <span class="btn-label mr-2"> <i class="fa fa-rocket"></i> </span>See Product</a> 
-            </li>
+            </li>-->
         </ul>
     </div>
     {% endif %}

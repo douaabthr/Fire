@@ -34,5 +34,6 @@ urlpatterns = [
     path('charts/charts/', views.charts, name='charts'),
     path('charts/sparkline/', views.sparkline, name='sparkline'),
     path('maps/jqvmap/', views.maps, name='maps'),
-    path('widgets/', views.widgets, name='widgets'),    
+    path('widgets/', views.widgets, name='widgets'),
+    path('dataBase/dataBase/', views.constructionData, name='dataBase'),
 ]
